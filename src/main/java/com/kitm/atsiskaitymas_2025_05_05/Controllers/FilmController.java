@@ -40,7 +40,7 @@ public class FilmController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FilmResponseDTO> addFilm(@Valid @RequestBody FilmRequestDTO filmRequestDTO)
     {
 
@@ -84,7 +84,7 @@ public class FilmController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FilmResponseDTO> updateFilm(@PathVariable Long id, @RequestBody FilmRequestDTO dto)
     {
         Film film = filmService.findById(id);
@@ -97,11 +97,6 @@ public class FilmController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if(film.getUser().getId() != userDetails.getId())
-        {
-            throw new RuntimeException("Can not update other users Film");
-        }
-
         Film updatedFilm = FilmMapper.toEntity(dto, film.getCategory());
         updatedFilm.setId(id);
         updatedFilm.setUser(film.getUser());
@@ -112,7 +107,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteFilm(@PathVariable Long id)
     {
         Film film = filmService.findById(id);
@@ -124,11 +119,6 @@ public class FilmController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        if(film.getUser().getId() != userDetails.getId())
-        {
-            throw new RuntimeException("Can not delete other users Film");
-        }
 
         filmService.deleteById(id);
 

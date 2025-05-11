@@ -35,7 +35,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CatergoryResponseDTO> addCategory(@Valid @RequestBody CategoryRequestDTO dto)
     {
         Category category = CategoryMapper.toEntity(dto);
@@ -77,7 +77,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id)
     {
         Category category = categoryService.findById(id);
@@ -90,18 +90,13 @@ public class CategoryController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        if(category.getUser().getId() != userDetails.getId())
-        {
-            throw new RuntimeException("Can not delete other users category");
-        }
-
         categoryService.deleteById(id);
 
         return ResponseEntity.ok("Deleted hotel id - " + id);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CatergoryResponseDTO> updateCategory(@PathVariable Long id, @RequestBody CategoryRequestDTO dto)
     {
         Category category = categoryService.findById(id);
@@ -113,11 +108,6 @@ public class CategoryController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        if(category.getUser().getId() != userDetails.getId())
-        {
-            throw new RuntimeException("Can not update other users category");
-        }
 
         Category updatedCategory = CategoryMapper.toEntity(dto);
         updatedCategory.setId(id);
