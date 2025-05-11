@@ -1,6 +1,7 @@
 package com.kitm.atsiskaitymas_2025_05_05.services;
 
 import com.kitm.atsiskaitymas_2025_05_05.dao.FilmRepository;
+import com.kitm.atsiskaitymas_2025_05_05.entity.Category;
 import com.kitm.atsiskaitymas_2025_05_05.entity.Film;
 import jakarta.transaction.Transactional;
 import org.aspectj.apache.bcel.classfile.Module;
@@ -54,6 +55,29 @@ public class FilmService {
     public void deleteById(Long id)
     {
         filmRepository.deleteById(id);
+    }
+
+    public Film findByName(String name)
+    {
+        Optional<Film> result = filmRepository.findByName(name);
+
+        Film film = null;
+
+        if (result.isPresent())
+        {
+            film = result.get();
+        }
+        else
+        {
+            throw new RuntimeException("Did not find film by name -" + name);
+        }
+
+        return film;
+    }
+
+    public List<Film> findByCategory(Category category)
+    {
+        return filmRepository.findByCategory(category);
     }
 
 }

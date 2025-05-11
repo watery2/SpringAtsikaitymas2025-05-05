@@ -83,6 +83,30 @@ public class FilmController {
         return result.map(film -> ResponseEntity.ok(FilmMapper.mapToDto(film))).orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/name/{name}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<FilmResponseDTO> getFilmByName(@PathVariable String name)
+    {
+        Optional<Film> result = Optional.ofNullable(filmService.findByName(name));
+
+        return result.map(film -> ResponseEntity.ok(FilmMapper.mapToDto(film))).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/category/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Map<String, Object>> getFilmsByCategory(@PathVariable Long id)
+    {
+        Category category = categoryService.findById(id);
+
+        List<FilmResponseDTO> films = filmService.findByCategory(category).stream().map(FilmMapper::mapToDto).collect(Collectors.toList());
+
+        Map<String, Object> response = Map.of("status", "success",
+                "results", films.size(),
+                "data", films);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FilmResponseDTO> updateFilm(@PathVariable Long id, @RequestBody FilmRequestDTO dto)
